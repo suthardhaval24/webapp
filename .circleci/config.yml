@@ -1,0 +1,20 @@
+---
+version: 2
+jobs:
+  pr_check:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout #checkout source code to working directory
+      - run:
+          name: maven build
+          command:
+            echo "Hello World"
+
+
+workflows:
+  version: 2
+  pr-check-workflow:
+    jobs:
+      - pr_check
+      
