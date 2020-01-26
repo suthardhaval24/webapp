@@ -30,10 +30,7 @@ jobs:
       - run:
           name: step into webapp
           command: |
-            cd home
-            cd Desktop
-            cd webapp
-            cd webApplication
+            pwd
       - run:
           name: install packages
           command:
