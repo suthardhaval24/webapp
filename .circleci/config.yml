@@ -7,17 +7,9 @@ jobs:
     steps:
       - checkout #checkout source code to working directory
       - run:
-          name: step into webapp
+          name: maven build
           command: |
-            cd webApplication
-      - run:
-           name: install packages
-           command:
-             mvn install
-      - run:
-            name: run unit test
-            command:
-               mvn test
+            echo "Hello World"
 
   build:
     docker:
@@ -25,18 +17,10 @@ jobs:
     steps:
       - checkout #checkout source code to working directory
       - run:
-          name: step into webapp
-          command: |
-            cd webApplication
-      - run:
-          name: install packages
-          command:
-            mvn install
-      - run:
-          name: run unit test
-          command:
-            mvn test
-
+          name: maven build
+            command: |
+              echo "Hello World"
+              
 workflows:
   version: 2
   pr-check-workflow:
@@ -49,3 +33,4 @@ workflows:
             branches:
               only:
                 - master
+
