@@ -7,14 +7,52 @@ jobs:
     steps:
       - checkout #checkout source code to working directory
       - run:
-          name: maven build
-          command:
-            echo "Hello World"
+          name: step into webapp
+          command: |
+            cd home
+            cd Desktop
+            cd webapp
+            cd webApplication
+      - run:
+           name: install packages
+           command:
+             mvn install
+      - run:
+            name: run unit test
+            command:
+               mvn test
 
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout #checkout source code to working directory
+      - run:
+          name: step into webapp
+          command: |
+            cd home
+            cd Desktop
+            cd webapp
+            cd webApplication
+      - run:
+          name: install packages
+          command:
+            mvn install
+      - run:
+          name: run unit test
+          command:
+            mvn test
 
 workflows:
   version: 2
   pr-check-workflow:
     jobs:
       - pr_check
-      
+  build-deploy-workflow:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - master
+
