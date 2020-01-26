@@ -8,8 +8,8 @@ jobs:
       - checkout #checkout source code to working directory
       - run:
           name: step into webapp
-          command:
-            pwd
+          command: |
+            cd webApplication
       - run:
            name: install packages
            command:
@@ -26,8 +26,8 @@ jobs:
       - checkout #checkout source code to working directory
       - run:
           name: step into webapp
-          command:
-            pwd
+          command: |
+            cd webApplication
       - run:
           name: install packages
           command:
@@ -49,4 +49,3 @@ workflows:
             branches:
               only:
                 - master
-
