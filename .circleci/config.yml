@@ -9,7 +9,6 @@ jobs:
       - run:
           name: step into webapp
           command:
-            pwd #cd webApplication
             ls
       - run:
           name: install packages
