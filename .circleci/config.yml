@@ -6,7 +6,7 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
-      - checkout #checkout source code to working directory
+      - checkout
         path: ~/webapp
       - run:
           name: step into webapp
