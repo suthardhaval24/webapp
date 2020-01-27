@@ -8,8 +8,9 @@ jobs:
       - checkout #checkout source code to working directory
       - run:
           name: step into webapp
-          command:
+          command: |
             cd WebApplication
+            ls
       - run:
           name: install packages
           command:
