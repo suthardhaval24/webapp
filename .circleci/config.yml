@@ -2,22 +2,15 @@
 version: 2
 jobs:
   pr_check:
-    working_directory: ~/webapp/WebApplication
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout #checkout source code to working directory
       - run:
           name: step into webapp
-          command:
-            ls
-      - run:
-          name: install packages
-          command:
-            mvn install
-      - run:
-          name: run unit test
-          command:
+          command: |
+            cd WebApplication
+            mvn clean install
             mvn test
 
   build:
