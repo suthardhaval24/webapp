@@ -7,12 +7,11 @@ jobs:
     steps:
       - checkout #checkout source code to working directory
       - run:
-          name: step into webapp
+          name: step into webapp and execute test
           command: |
             cd WebApplication
             mvn clean install
             mvn test
-
   build:
     docker:
       - image: circleci/openjdk:8-jdk
@@ -20,15 +19,9 @@ jobs:
       - checkout #checkout source code to working directory
       - run:
           name: step into webapp
-          command:
-            cd webApplication
-      - run:
-          name: install packages
-          command:
-            mvn install
-      - run:
-          name: run unit test
-          command:
+          command: |
+            cd WebApplication
+            mvn clean install
             mvn test
 
 workflows:
