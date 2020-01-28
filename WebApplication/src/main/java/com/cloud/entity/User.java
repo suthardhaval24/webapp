@@ -1,6 +1,7 @@
 package com.cloud.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +15,8 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue
-    @Column(name = "user_id", columnDefinition = "BINARY(16)")
+    @Type(type="uuid-char")
+    @Column(name = "user_id")
     private UUID uuid;
     @Column
     private String first_name;

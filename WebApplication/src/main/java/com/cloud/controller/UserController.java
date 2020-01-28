@@ -55,7 +55,11 @@ public class UserController {
 
     //GET API : get user info
     @RequestMapping(value="v1/user/self" ,method = RequestMethod.GET)
-    public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token, HttpServletRequest request) throws UnsupportedEncodingException {
+    public ResponseEntity<?> getUser(@RequestHeader(value = "Authorization",required = false) String token, HttpServletRequest request) throws UnsupportedEncodingException {
+
+        if (token == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
 
         String userDetails[] = decryptAuthenticationToken(token);
 
@@ -67,8 +71,11 @@ public class UserController {
 
     //PUT API : Upate user
     @RequestMapping(value = "v1/user/self", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String Header, @Valid @RequestBody User user, BindingResult errors,
-                                             HttpServletResponse response) throws UnsupportedEncodingException {
+    public ResponseEntity<?> updateUser(@RequestHeader(value = "Authorization",required = false) String Header, @Valid @RequestBody User user, BindingResult errors,
+                                        HttpServletResponse response) throws UnsupportedEncodingException {
+        if (Header == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
 
         String[] userDetails =  decryptAuthenticationToken(Header);
 
@@ -78,7 +85,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
         }
     }
-
     //decryptToken
     public String[] decryptAuthenticationToken(String token) throws UnsupportedEncodingException {
         String[] basicAuthToken = token.split(" ");

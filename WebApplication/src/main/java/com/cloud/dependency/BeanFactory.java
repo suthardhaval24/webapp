@@ -1,6 +1,7 @@
 package com.cloud.dependency;
 
 
+import com.cloud.validator.BillValidator;
 import com.cloud.validator.UserValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,9 @@ public class BeanFactory {
     public UserValidator userValidator(){
         return new UserValidator();
     }
+
+    @Bean
+    public BillValidator billValidator() {return  new BillValidator();}
 
     @Bean
     public BasicAuthenticationEntryPoint basicAuthenticationEntryPoint(){
