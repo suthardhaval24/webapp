@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -49,10 +50,17 @@ public class BillController {
 
 
     @PostMapping(value = "/v1/bill/")
-    public ResponseEntity<?> createBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody Bill bill, BindingResult errors,
+    public ResponseEntity<?> createBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
+
+        //check that authorization header is not missing
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        //check that body is not empty
+        if (bill == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request body cannot be empty");
         }
 
         BillStatus billStatus;
@@ -75,11 +83,6 @@ public class BillController {
         }
     }
 
-    //json mapping exception
-    @ExceptionHandler({JsonMappingException.class})
-    public ResponseEntity<?> handleException() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date format should be in 'YYYY-MM_DD' or payment_status value one of this : [paid, due, past_due, no_payment_required]");
-    }
 
     @GetMapping("/v1/bills")
     public ResponseEntity<?> getBills(@RequestHeader(value = "Authorization", required = false) String token) throws Exception {
@@ -180,10 +183,15 @@ public class BillController {
     }
 
     @PutMapping("/v1/bill/{id}")
-    public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody Bill bill, BindingResult errors,
+    public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         @PathVariable("id") String id) throws Exception {
         if (token == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unauthorized");
+        }
+
+        //check that body is not empty
+        if (bill == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request body cannot be empty");
         }
 
         BillStatus billStatus;
@@ -224,6 +232,12 @@ public class BillController {
                 }
             }
         }
+    }
+
+    //json mapping exception
+    @ExceptionHandler({JsonMappingException.class})
+    public ResponseEntity<?> handleException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date format should be in 'YYYY-MM_DD' or amount_due should be numeric or payment_status value one of this : [paid, due, past_due, no_payment_required]");
     }
 
     //decryptToken

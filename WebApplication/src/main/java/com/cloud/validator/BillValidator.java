@@ -25,7 +25,7 @@ public class BillValidator implements Validator {
 
         Bill bill = (Bill) target;
 
-        if (!(bill.getAmount_due() > 0.01))
+        if (!(bill.getAmount_due() > 0.01) || !(bill.getAmount_due() < Double.MAX_VALUE))
             errors.rejectValue("amount_due", "Cannot be less than 0.01");
         
     }
