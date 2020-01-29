@@ -49,7 +49,7 @@ public class Bill {
     @Enumerated(EnumType.STRING)
     private Payment_Status payment_status;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
