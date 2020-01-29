@@ -50,5 +50,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.PUT,"v1/user/self").fullyAuthenticated()
                 .anyRequest().permitAll();
+
+        //authenticated api
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.POST,"/v1/bill").fullyAuthenticated()
+                .anyRequest().permitAll();
+
+        //authenticated api
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.GET,"/v1/bills").fullyAuthenticated()
+                .anyRequest().permitAll();
+
+        //authenticated api
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.GET,"/v1/bill/{id}").fullyAuthenticated()
+                .anyRequest().permitAll();
+
+        //authenticated api
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.DELETE,"/v1/bill/{id}").fullyAuthenticated()
+                .anyRequest().permitAll();
     }
 }
