@@ -59,11 +59,15 @@ public class UserService implements UserDetailsService {
 
 
     public UserRegistrationStatus getRegistrationStatus(BindingResult errors) {
+        FieldError first_nameError = errors.getFieldError("first_name");
+        FieldError last_nameError = errors.getFieldError("last_name");
         FieldError emailIdError = errors.getFieldError("emailId");
         FieldError passwordError = errors.getFieldError("password");
+        String first_nameErrorMessage = first_nameError == null ? "-" : first_nameError.getCode();
+        String last_nameErrorMessage = last_nameError == null ? "-" : last_nameError.getCode();
         String emailIdErrorMessage = emailIdError == null ? "-" : emailIdError.getCode();
         String passwordErrorMessage = passwordError == null ? "-" : passwordError.getCode();
-        UserRegistrationStatus userRegistrationStatus = new UserRegistrationStatus(emailIdErrorMessage, passwordErrorMessage);
+        UserRegistrationStatus userRegistrationStatus = new UserRegistrationStatus(first_nameErrorMessage,last_nameErrorMessage,emailIdErrorMessage, passwordErrorMessage);
         return userRegistrationStatus;
     }
 
