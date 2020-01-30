@@ -79,7 +79,6 @@ public class UserController {
         }
 
         String[] userDetails = decryptAuthenticationToken(Header);
-
         if (userService.updateUserInfo(user, userDetails[0], userDetails[1])) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
         } else {
