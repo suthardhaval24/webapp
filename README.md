@@ -15,7 +15,7 @@ update and retrieve User and Bills and Spring Security to secure GET & PUT & Del
 
 Pre-req : Need POSTMAN and MySQL installed.
  1. Clone repository git@github.com:suthard-spring2020/webapp.git
- 2. Import Maven Dependencies
+ 2. Import Maven dependencies
  3. Run application by traversing to webapp/Webapplication
  4. Through IDE, under src tab, find Webapplication.java and run that file.
  5. Through command line: mvn clean install and then mvn test
