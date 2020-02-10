@@ -64,7 +64,7 @@ Pre-req : Need POSTMAN and MySQL installed.
         
     * To Create a Bill 
         - Use v1/bill/ & set Authentication to Basic Auth
-        - Success : 200 
+        - Success : 201
             {
                 "id": "75da0038-1ca2-4c8a-b381-6e8776f928dc",
                 "owner_id": "b4afeb77-8c20-4843-aa57-fd9c2da494ee",
@@ -145,7 +145,33 @@ Pre-req : Need POSTMAN and MySQL installed.
         - Not Found : 404 //wrong url
         - UnAuthorized : 401 //unauthorized
             Access Denied
-                    
+        
+    * To attach a file to bill:
+        -Use : localhost:8080/v1/bill/{billId}/file
+        -Success : 201
+            {
+                "id": "aab496d7-f065-4dc9-9e0a-1e95ef3ff8cb",
+                "fileName": "RESUME_DATA.pdf",
+                "url": "/home/dhaval/Desktop/webapp/WebApplication/resource/files/RESUME_DATA_486b3dac-14bb-4f4a-a5c8-8b6dbaccba9e.pdf",
+                "uploadeDate": "2020-02-10T21:31:07.335+0000"
+            }
+        - 404 : NotFound/UnAuthorized
+        
+    * To get a file information of bill:
+        -Use : localhost:8080/v1/bill/{billId}/file/{fileId}
+        -Success : 200
+            {
+                "id": "aab496d7-f065-4dc9-9e0a-1e95ef3ff8cb",
+                "fileName": "RESUME_DATA.pdf",
+                "url": "/home/dhaval/Desktop/webapp/WebApplication/resource/files/RESUME_DATA_486b3dac-14bb-4f4a-a5c8-8b6dbaccba9e.pdf",
+                "uploadeDate": "2020-02-10T21:31:07.335+0000"
+            }
+        - 404 : NotFound/UnAuthorized
+    
+    * To delete a file attached to bill:
+        -Use : localhost:8080/v1/bill/{billId}/file/{fileId}
+        -No Content : 204 
+        
 ## Running Tests
 
 1. Implemented Junit using Mockito for unit testing for creation of user.
