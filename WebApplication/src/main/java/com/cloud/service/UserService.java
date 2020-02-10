@@ -1,6 +1,6 @@
 package com.cloud.service;
 
-import com.cloud.dao.UserDao;
+import com.cloud.repository.UserRepository;
 import com.cloud.entity.User;
 import com.cloud.entity.UserDetailsCustom;
 import com.cloud.errors.UserRegistrationStatus;
@@ -21,7 +21,7 @@ import java.util.Date;
 public class UserService implements UserDetailsService {
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
         try {
             passwordEncoder = new BCryptPasswordEncoder();
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user = userDao.save(user);
+            user = userRepository.save(user);
         } catch (Exception e){
             return null;
         }
@@ -41,18 +41,18 @@ public class UserService implements UserDetailsService {
 
     //emailcheck
     public Boolean isEmailPresent(String emailId) {
-        return userDao.isEmailPresent(emailId) > 0 ? true : false;
+        return userRepository.isEmailPresent(emailId) > 0 ? true : false;
     }
 
     //getuserdetails
     public User getUser(String emailId) {
-        return userDao.findByEmailId(emailId);
+        return userRepository.findByEmailId(emailId);
     }
 
 
     @Override
     public UserDetails loadUserByUsername(String emailId) throws UsernameNotFoundException {
-        User user = userDao.findByEmailId(emailId);
+        User user = userRepository.findByEmailId(emailId);
         if(user==null) throw new UsernameNotFoundException("User with given emailId does not exist");
         else return new UserDetailsCustom(user);
     }
@@ -73,7 +73,7 @@ public class UserService implements UserDetailsService {
 
     //update user
     public Boolean updateUserInfo(User newUser, String emailId, String Password){
-        User currUser = userDao.findByEmailId(emailId);
+        User currUser = userRepository.findByEmailId(emailId);
         if(currUser.getEmailId().equals(emailId)) {
             PasswordValidator validator = new PasswordValidator(Arrays.asList(
                     new LengthRule(9, 30),
@@ -90,7 +90,7 @@ public class UserService implements UserDetailsService {
                 currUser.setLast_name(newUser.getLast_name());
                 currUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
                 currUser.setUpdatedTime(new Date());
-                userDao.save(currUser);
+                userRepository.save(currUser);
                 return true;
             }
             else{

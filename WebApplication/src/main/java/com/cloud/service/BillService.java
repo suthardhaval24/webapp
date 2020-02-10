@@ -1,9 +1,8 @@
 package com.cloud.service;
 
 
-import com.cloud.dao.BillRepository;
+import com.cloud.repository.BillRepository;
 import com.cloud.errors.BillStatus;
-import com.cloud.errors.UserRegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
