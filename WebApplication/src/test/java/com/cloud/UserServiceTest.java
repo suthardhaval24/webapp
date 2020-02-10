@@ -1,6 +1,6 @@
 package com.cloud;
 
-import com.cloud.dao.UserDao;
+import com.cloud.repository.UserRepository;
 import com.cloud.entity.User;
 import com.cloud.service.UserService;
 import org.junit.Before;
@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
@@ -22,7 +21,7 @@ public class UserServiceTest {
 	private UserService userService;
 
 	@Mock
-	private UserDao userdao;
+	private UserRepository userdao;
 
 	private static User user;
 

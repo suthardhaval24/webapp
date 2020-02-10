@@ -1,8 +1,7 @@
 package com.cloud.controller;
 
-import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
-import com.cloud.dao.BillRepository;
-import com.cloud.dao.UserDao;
+import com.cloud.repository.BillRepository;
+import com.cloud.repository.UserRepository;
 import com.cloud.entity.Bill;
 import com.cloud.entity.User;
 import com.cloud.errors.BillStatus;
@@ -10,18 +9,16 @@ import com.cloud.service.BillService;
 import com.cloud.service.UserService;
 import com.cloud.validator.BillValidator;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -38,7 +35,7 @@ public class BillController {
     private BillService billService;
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Autowired
     private BillValidator billValidator;
@@ -73,9 +70,9 @@ public class BillController {
             if (!(userService.isEmailPresent(userDetails[0])))
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             else
-                user = userDao.findByEmailId(userDetails[0]);
+                user = userRepository.findByEmailId(userDetails[0]);
             bill.setOwner_id(user.getUuid());
-            bill.setUser(userDao.findByEmailId(userDetails[0]));
+            bill.setUser(userRepository.findByEmailId(userDetails[0]));
             bill.setCreationTime(new Date());
             bill.setUpdatedTime(new Date());
             Bill new_bill = billRepository.save(bill);
@@ -169,12 +166,18 @@ public class BillController {
             try {
                 bill = billRepository.findById(billId).get();
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No content");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No content");
             }
             user = userService.getUser(userDetails[0]);
             if (!bill.getOwner_id().equals(user.getUuid())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NOT FOUND");
             } else {
+                //delete file from dir
+                if (bill.getFileUpload() != null) {
+                    String path = bill.getFileUpload().getUrl();
+                    File file = new File(path);
+                    file.delete();
+                }
                 billRepository.delete(bill);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
 

@@ -32,10 +32,10 @@ build/
 .vscode/
 
 
-# Compiled class file
+# Compiled class fileUpload
 *.class
 
-# Log file
+# Log fileUpload
 *.log
 
 # BlueJ files

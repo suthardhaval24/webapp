@@ -1,4 +1,4 @@
-package com.cloud.dao;
+package com.cloud.repository;
 
 import com.cloud.entity.Bill;
 import org.springframework.data.jpa.repository.JpaRepository;

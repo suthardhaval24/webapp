@@ -2,8 +2,7 @@ package com.cloud.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -16,25 +15,24 @@ import java.util.UUID;
 @Entity
 public class Bill {
 
-    public enum Payment_Status
-    {
+    public enum Payment_Status {
         paid, due, past_due, no_payment_required;
     }
 
     @Id
     @GeneratedValue
-    @Type(type="uuid-char")
+    @Type(type = "uuid-char")
     @Column(name = "bill_id")
     private UUID id;
-    @Column(name="owner_id")
+    @Column(name = "owner_id")
     private UUID owner_id;
     @Column
     private String vendor;
     @Column
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date bill_date;
     @Column
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date due_date;
     @Column
     private Double amount_due;
@@ -53,12 +51,16 @@ public class Bill {
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
-
+    @JsonProperty("attachment")
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade =  CascadeType.ALL,
+            mappedBy = "bill")
+    private FileUpload fileUpload;
 
     public Bill() {
     }
 
-    public Bill(UUID bill_id,String vendor,Date bill_date,Date due_date,Double amount_due,Payment_Status payment_status){
+    public Bill(UUID bill_id, String vendor, Date bill_date, Date due_date, Double amount_due, Payment_Status payment_status) {
         this.id = bill_id;
         this.vendor = vendor;
         this.bill_date = bill_date;
@@ -153,5 +155,13 @@ public class Bill {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public FileUpload getFileUpload() {
+        return fileUpload;
+    }
+
+    public void setFileUpload(FileUpload fileUpload) {
+        this.fileUpload = fileUpload;
     }
 }
