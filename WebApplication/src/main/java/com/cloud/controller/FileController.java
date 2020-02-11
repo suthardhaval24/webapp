@@ -79,7 +79,7 @@ public class FileController {
                     } else {
                         String actualPath = fileUpload(file);
                         System.out.println(actualPath);
-                        FileUpload newFileUpload = fileStorageService.storeFile(file, actualPath);
+                        FileUpload newFileUpload = fileStorageService.storeFile(file, actualPath, user_bill);
                         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                                 .path("/FileUpload/")
                                 .path(newFileUpload.getId().toString())

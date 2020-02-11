@@ -38,7 +38,7 @@ public class FileUpload {
     @Column
     @JsonIgnore
     private String md5Hex;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)//one-to-one
     @JoinColumn(name = "bill_id")
     @JsonIgnore
     private Bill bill;
@@ -46,7 +46,7 @@ public class FileUpload {
     public FileUpload() {
     }
 
-    public FileUpload(String fileName, String url, Date uploadDate, String creationTime, String lastAccessTime, String lastModifiedTime, Long size, String contentType, String md5Hex) {
+    public FileUpload(String fileName, String url, Date uploadDate, String creationTime, String lastAccessTime, String lastModifiedTime, Long size, String contentType, String md5Hex, Bill bill) {
         this.fileName = fileName;
         this.url = url;
         this.uploadeDate = uploadDate;
@@ -56,6 +56,7 @@ public class FileUpload {
         this.size = size;
         this.contentType = contentType;
         this.md5Hex = md5Hex;
+        this.bill = bill;
     }
 
     public UUID getId() {

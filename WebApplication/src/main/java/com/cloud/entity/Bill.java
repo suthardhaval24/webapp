@@ -51,7 +51,6 @@ public class Bill {
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
-    @JsonProperty("attachment")
     @OneToOne(fetch = FetchType.LAZY,
             cascade =  CascadeType.ALL,
             mappedBy = "bill")
