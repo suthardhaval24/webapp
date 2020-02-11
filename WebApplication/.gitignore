@@ -72,4 +72,4 @@ mvnw
 .mvn/*
 
 # ignoring resouces
-/resources/*
+/resource/*
