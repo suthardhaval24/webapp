@@ -75,6 +75,8 @@ public class BillController {
             bill.setUser(userRepository.findByEmailId(userDetails[0]));
             bill.setCreationTime(new Date());
             bill.setUpdatedTime(new Date());
+            //from this attachment always be null
+            bill.setFileUpload(null);
             Bill new_bill = billRepository.save(bill);
             return new ResponseEntity<Bill>(new_bill, HttpStatus.CREATED);
         }
