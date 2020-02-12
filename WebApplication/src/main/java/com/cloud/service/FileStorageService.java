@@ -14,9 +14,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.UserPrincipal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 
 @Service
@@ -37,7 +39,8 @@ public class FileStorageService {
         Long size = attr.size();
         String md5Hex = DigestUtils.md5Hex(fileName);
         String contentType = Files.probeContentType(path);
-        FileUpload newFileUpload = new FileUpload(fileName, actualPath, new Date(),creationTime,lastAccessTime,lastModifiedTime,size,contentType,md5Hex,userBill);
+        UserPrincipal owner = Files.getOwner(path);
+        FileUpload newFileUpload = new FileUpload(UUID.randomUUID(),fileName, actualPath, new Date(),creationTime,lastAccessTime,lastModifiedTime,size,contentType,md5Hex,owner.getName(),userBill);
         return fileRepository.save(newFileUpload);
 
     }
