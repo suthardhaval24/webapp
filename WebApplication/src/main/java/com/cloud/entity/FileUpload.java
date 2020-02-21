@@ -1,6 +1,7 @@
 package com.cloud.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.UUID;
 @Entity
 public class FileUpload {
     @Id
+    @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "file_id")
     private UUID id;
@@ -40,18 +42,14 @@ public class FileUpload {
     @Column
     @JsonIgnore
     private String owner;
-    @OneToOne(cascade = CascadeType.ALL)//one-to-one
-    @JoinColumn(name = "bill_id")
-    @JsonIgnore
-    private Bill bill;
 
     public FileUpload() {
     }
 
-    public FileUpload(UUID id, String fileName, String url, Date uploadDate, String creationTime, String lastAccessTime, String lastModifiedTime,
-                      Long size, String contentType, String md5Hex, String owner, Bill bill) {
+    public FileUpload(String fileName, String url, Date uploadDate, String creationTime, String lastAccessTime, String lastModifiedTime,
+                      Long size, String contentType, String md5Hex, String owner) {
         //setting id manually to avoid on fly creation of file
-        this.id = id;
+        //this.id = id;
         this.fileName = fileName;
         this.url = url;
         this.uploadeDate = uploadDate;
@@ -62,7 +60,6 @@ public class FileUpload {
         this.contentType = contentType;
         this.md5Hex = md5Hex;
         this.owner = owner;
-        this.bill = bill;
     }
 
     public UUID getId() {
@@ -143,13 +140,5 @@ public class FileUpload {
 
     public void setMd5Hex(String md5Hex) {
         this.md5Hex = md5Hex;
-    }
-
-    public Bill getBill() {
-        return bill;
-    }
-
-    public void setBill(Bill bill) {
-        this.bill = bill;
     }
 }

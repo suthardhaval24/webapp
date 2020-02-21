@@ -27,7 +27,7 @@ public class FileStorageService {
     @Autowired
     private FileRepository fileRepository;
 
-    public FileUpload storeFile(MultipartFile file, String actualPath, Bill userBill) throws IOException {
+    public FileUpload storeFile(MultipartFile file, String actualPath) throws IOException {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         //getting metadata information
         Path path = Paths.get(actualPath);
@@ -40,9 +40,8 @@ public class FileStorageService {
         String md5Hex = DigestUtils.md5Hex(fileName);
         String contentType = Files.probeContentType(path);
         UserPrincipal owner = Files.getOwner(path);
-        FileUpload newFileUpload = new FileUpload(UUID.randomUUID(),fileName, actualPath, new Date(),creationTime,lastAccessTime,lastModifiedTime,size,contentType,md5Hex,owner.getName(),userBill);
+        FileUpload newFileUpload = new FileUpload(fileName, actualPath, new Date(),creationTime,lastAccessTime,lastModifiedTime,size,contentType,md5Hex,owner.getName());
         return fileRepository.save(newFileUpload);
-
     }
 
 }
