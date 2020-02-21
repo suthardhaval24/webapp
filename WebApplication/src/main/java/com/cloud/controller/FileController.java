@@ -79,7 +79,9 @@ public class FileController {
                     } else {
                         String actualPath = fileUpload(file);
                         System.out.println(actualPath);
-                        FileUpload newFileUpload = fileStorageService.storeFile(file, actualPath, user_bill);
+                        FileUpload newFileUpload = fileStorageService.storeFile(file, actualPath);
+                        user_bill.setFileUpload(newFileUpload);
+                        billRepository.save(user_bill);
                         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                                 .path("/FileUpload/")
                                 .path(newFileUpload.getId().toString())
@@ -138,7 +140,7 @@ public class FileController {
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
-                if (!user_bill.getId().equals(fileUpload.getBill().getId())) {
+                if (!user_bill.getFileUpload().getId().equals(fileUpload.getId())) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
                 } else {
                     return new ResponseEntity<FileUpload>(fileUpload, HttpStatus.OK);
@@ -193,7 +195,7 @@ public class FileController {
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
-                if (!user_bill.getId().equals(fileUpload.getBill().getId())) {
+                if (!user_bill.getFileUpload().getId().equals(fileUpload.getId())) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
                 } else {
 //                    Working
@@ -202,6 +204,8 @@ public class FileController {
                     file.delete();
                     user_bill.setFileUpload(null);
                     fileRepository.delete(fileUpload);
+                    user_bill.setFileUpload(null);
+                    billRepository.save(user_bill);
                     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
                 }
             }

@@ -51,9 +51,8 @@ public class Bill {
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
-    @OneToOne(fetch = FetchType.LAZY,
-            cascade =  CascadeType.ALL,
-            mappedBy = "bill")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "file_id")
     private FileUpload fileUpload;
 
     public Bill() {
