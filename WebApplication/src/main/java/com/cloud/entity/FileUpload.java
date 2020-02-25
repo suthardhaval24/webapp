@@ -1,7 +1,6 @@
 package com.cloud.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -23,15 +22,6 @@ public class FileUpload {
     private Date uploadeDate;
     @Column
     @JsonIgnore
-    private String creationTime;
-    @Column
-    @JsonIgnore
-    private String lastAccessTime;
-    @Column
-    @JsonIgnore
-    private String lastModifiedTime;
-    @Column
-    @JsonIgnore
     private Long size;
     @Column
     @JsonIgnore
@@ -39,27 +29,19 @@ public class FileUpload {
     @Column
     @JsonIgnore
     private String md5Hex;
-    @Column
-    @JsonIgnore
-    private String owner;
 
     public FileUpload() {
     }
 
-    public FileUpload(String fileName, String url, Date uploadDate, String creationTime, String lastAccessTime, String lastModifiedTime,
-                      Long size, String contentType, String md5Hex, String owner) {
+    public FileUpload(String fileName, String url, Date uploadDate, Long size, String contentType, String md5Hex) {
         //setting id manually to avoid on fly creation of file
         //this.id = id;
         this.fileName = fileName;
         this.url = url;
         this.uploadeDate = uploadDate;
-        this.creationTime = creationTime;
-        this.lastAccessTime = lastAccessTime;
-        this.lastModifiedTime = lastModifiedTime;
         this.size = size;
         this.contentType = contentType;
         this.md5Hex = md5Hex;
-        this.owner = owner;
     }
 
     public UUID getId() {
@@ -92,30 +74,6 @@ public class FileUpload {
 
     public void setUploadeDate(Date uploadeDate) {
         this.uploadeDate = uploadeDate;
-    }
-
-    public String getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(String creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public String getLastAccessTime() {
-        return lastAccessTime;
-    }
-
-    public void setLastAccessTime(String lastAccessTime) {
-        this.lastAccessTime = lastAccessTime;
-    }
-
-    public String getLastModifiedTime() {
-        return lastModifiedTime;
-    }
-
-    public void setLastModifiedTime(String lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
     }
 
     public Long getSize() {

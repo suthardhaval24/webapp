@@ -5,6 +5,7 @@ import com.cloud.entity.FileUpload;
 import com.cloud.entity.User;
 import com.cloud.repository.BillRepository;
 import com.cloud.repository.FileRepository;
+import com.cloud.service.AWSFileStorageService;
 import com.cloud.service.FileStorageService;
 import com.cloud.service.UserService;
 import org.apache.commons.io.FilenameUtils;
@@ -13,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -33,6 +33,9 @@ public class FileController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AWSFileStorageService awsFileStorageService;
 
     @PostMapping("/v1/bill/{billId}/file")
     public ResponseEntity<?> uploadFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String id,
@@ -77,15 +80,10 @@ public class FileController {
                     if (user_bill.getFileUpload() != null) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File already Exist,First delete and upload new one.");
                     } else {
-                        String actualPath = fileUpload(file);
-                        System.out.println(actualPath);
+                        String actualPath = awsFileStorageService.storeFile(file);
                         FileUpload newFileUpload = fileStorageService.storeFile(file, actualPath);
                         user_bill.setFileUpload(newFileUpload);
                         billRepository.save(user_bill);
-                        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path("/FileUpload/")
-                                .path(newFileUpload.getId().toString())
-                                .toUriString();
                         //System.out.println(fileDownloadUri);
                         return new ResponseEntity<FileUpload>(newFileUpload, HttpStatus.CREATED);
                     }
@@ -199,9 +197,12 @@ public class FileController {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
                 } else {
 //                    Working
-                    String path = fileUpload.getUrl();
-                    File file = new File(path);
-                    file.delete();
+//                    String path = fileUpload.getUrl();
+//                    File file = new File(path);
+//                    file.delete();
+                    if(!awsFileStorageService.deleteFile(fileUpload.getUrl())){
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                    }
                     user_bill.setFileUpload(null);
                     fileRepository.delete(fileUpload);
                     user_bill.setFileUpload(null);
@@ -220,6 +221,7 @@ public class FileController {
 
     }
 
+    //local file storage code
     public String fileUpload(MultipartFile uploadFile) {
         InputStream inputStream = null;
         OutputStream outputStream = null;
