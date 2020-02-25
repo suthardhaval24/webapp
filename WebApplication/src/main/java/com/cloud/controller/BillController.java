@@ -5,6 +5,7 @@ import com.cloud.repository.UserRepository;
 import com.cloud.entity.Bill;
 import com.cloud.entity.User;
 import com.cloud.errors.BillStatus;
+import com.cloud.service.AWSFileStorageService;
 import com.cloud.service.BillService;
 import com.cloud.service.UserService;
 import com.cloud.validator.BillValidator;
@@ -39,6 +40,9 @@ public class BillController {
 
     @Autowired
     private BillValidator billValidator;
+
+    @Autowired
+    private AWSFileStorageService awsFileStorageService;
 
     @InitBinder
     private void initBinder(WebDataBinder binder) {
@@ -177,8 +181,9 @@ public class BillController {
                 //delete file from dir
                 if (bill.getFileUpload() != null) {
                     String path = bill.getFileUpload().getUrl();
-                    File file = new File(path);
-                    file.delete();
+                    if(!awsFileStorageService.deleteFile(path)){
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                    }
                 }
                 billRepository.delete(bill);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
