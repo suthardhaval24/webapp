@@ -8,8 +8,9 @@
 
 ## Technology Stack
 
-The Bill Tracking application is developed using Java Spring Boot framework that uses the REST architecture to create,
-update and retrieve User and Bills and Spring Security to secure GET & PUT & Delete api calls.
+ 1. The Bill Tracking application is developed using Java Spring Boot framework that uses the REST architecture to create,
+    update and retrieve User and Bills and Spring Security to secure GET & PUT & Delete api calls.
+ 2. The attachment to the bill will be uploaded to s3 bucket based on the user's aws profile setup. 
 
 ## Build Instructions
 
@@ -18,7 +19,7 @@ Pre-req : Need POSTMAN and MySQL installed.
  2. Import Maven dependencies
  3. Run application by traversing to webapp/Webapplication
  4. Through IDE, under src tab, find Webapplication.java and run that file.
- 5. Through command line: mvn clean install and then mvn test
+ 5. Through command line: mvn clean install and then mvn test or to run application: mvn spring-boot:run
 
 ## Deploy Instructions
     * Open POSTMAN
