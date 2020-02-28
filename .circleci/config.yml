@@ -7,6 +7,43 @@ jobs:
     steps:
       - checkout #checkout source code to working directory
       - run:
+          name: Install Packages
+          command: sudo apt-get update && sudo apt-get install wget zip unzip python3 python-pip -y
+      - run:
+          name: Install awscli
+          command: |
+            sudo pip install awscli
+            aws configure set default.region us-east-1
+      - run:
+          name: Build Artifact
+          command: |
+            cd webapp
+            pwd
+            ls -al
+            mvn clean install
+            cd target/
+            ls-al
+            cd ../
+            pwd
+            ls -al
+      - run:
+          name: Zip Artifact
+          command: |
+            echo "Current Build Number is ${CIRCLE_BUILD_NUM}"
+            pwd
+            mkdir -p codeDeploy_Artifact
+            cd codeDeploy_Artifact
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
+            rm *.yml *.sh *.properties *.jar
+            ls -al
+            pwd
+            cd ..
+            pwd
+            ls -al
+      - run:
+          name: Upload Artficat to S3
+          command: aws s3 cp --recursive codeDeploy_Artifact s3://${CODE_DEPLOY_S3_BUCKET}
+      - run:
           name: step into webapp and execute test
           command: |
             cd WebApplication
