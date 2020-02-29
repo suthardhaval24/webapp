@@ -19,6 +19,7 @@ jobs:
           command: |
             pwd
             ls -al
+            cd WebApplication
             mvn clean install
             cd target/
             ls-al
