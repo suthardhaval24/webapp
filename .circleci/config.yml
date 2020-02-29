@@ -32,7 +32,6 @@ jobs:
             pwd
             mkdir -p codeDeploy_Artifact
             cd codeDeploy_Artifact
-            cp ../webapp/*yml .
             cp ../WebApplication/target/WebApplication-0.0.1-SNAPSHOT.jar .
             cp ../WebApplication/src/main/resources/*.properties .
             ls -al
