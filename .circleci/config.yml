@@ -21,7 +21,7 @@ jobs:
             ls -al
             cd WebApplication
             mvn clean install
-            ls-alcd
+            ls -al
             cd ../
             pwd
             ls -al
