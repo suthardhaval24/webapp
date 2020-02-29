@@ -36,7 +36,6 @@ jobs:
             cp ../WebApplication/src/main/resources/*.properties .
             ls -al
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip .
-            rm *.yml *.sh *.properties *.jar
             ls -al
             pwd
             cd ..
