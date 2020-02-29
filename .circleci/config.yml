@@ -41,7 +41,7 @@ jobs:
             pwd
             ls -al
       - run:
-          name: Upload Artficat to S3
+          name: Upload Artficat to S3 Bucket
           command: aws s3 cp --recursive codeDeploy_Artifact s3://${CODE_DEPLOY_S3_BUCKET}
       - run:
           name: step into webapp and execute test
