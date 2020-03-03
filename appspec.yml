@@ -3,10 +3,10 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ubuntu/webapp
+    destination: /home/ubuntu/
 
 hooks:
   AfterInstall:
-    - location: ./afterInstall.sh
+    - location: ./CodeDeploy/afterInstall.sh
       timeout: 180
-      runas: centos
+      runas: ubuntu
