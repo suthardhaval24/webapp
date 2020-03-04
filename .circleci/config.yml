@@ -36,11 +36,12 @@ jobs:
             mkdir -p codeDeploy_Artifact
             cd codeDeploy_Artifact
             cp ../*.yml .
+            cp ../CodeDeploy/*.sh .
             cp ../WebApplication/target/WebApplication-0.0.1-SNAPSHOT.jar .
             cp ../WebApplication/src/main/resources/*.properties .
             ls -al
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip .
-            rm *.yml *.properties *.jar
+            rm *.yml *.sh *.properties *.jar
             ls -al
             pwd
             cd ..
