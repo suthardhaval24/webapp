@@ -3,5 +3,6 @@ cd /home/ubuntu
 sudo chown -R ubntu:ubntu /home/ubntu/
 sudo chmod +x WebApplication-0.0.1-SNAPSHOT.jar
 source /etc/environment
+kill -9 $(ps -ef|grep webApp | grep -v grep | awk '{print$2}')
 echo Starting WebApplication
-java -jar WebApplication-0.0.1-SNAPSHOT.jar
+nohup java -jar WebApplication-0.0.1-SNAPSHOT.jar > /home/ubuntu/output.txt
