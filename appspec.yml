@@ -7,6 +7,6 @@ files:
 
 hooks:
   AfterInstall:
-    - location: ./afterInstall.sh
+    - location: CodeDeploy/afterInstall.sh
       timeout: 180
       runas: root
