@@ -7,6 +7,17 @@ jobs:
     steps:
       - checkout #checkout source code to working directory
       - run:
+          name: step into webapp
+          command: |
+            cd WebApplication
+            mvn clean install
+            mvn test
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout #checkout source code to working directory
+      - run:
           name: Install Packages
           command: sudo apt-get update && sudo apt-get install wget zip unzip python3 python-pip -y
       - run:
@@ -60,18 +71,6 @@ jobs:
             cd WebApplication
             mvn clean install
             mvn test
-  build:
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - checkout #checkout source code to working directory
-      - run:
-          name: step into webapp
-          command: |
-            cd WebApplication
-            mvn clean install
-            mvn test
-
 workflows:
   version: 2
   pr-check-workflow:
