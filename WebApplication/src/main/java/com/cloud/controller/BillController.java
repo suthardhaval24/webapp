@@ -87,7 +87,7 @@ public class BillController {
     }
 
 
-    @GetMapping("/v1/bills")
+    @GetMapping("/v2/bills")
     public ResponseEntity<?> getBills(@RequestHeader(value = "Authorization", required = false) String token) throws Exception {
 
         if (token == null) {
