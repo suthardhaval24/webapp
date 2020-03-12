@@ -180,7 +180,11 @@ Pre-req : Need POSTMAN and MySQL installed.
 
 ## CircleCI
 1. Pr_check job : which will compile and run unit test on each pull request raised on organization master branch
-2. build_deploy job: which will compile and run unit test on merging pull request on organization master branch
+2. build_deploy job:
+  * Install AWS CLI and set profile 
+  * Creates zip artifact of the project 
+  * Uploads it to AWS S3 Bucket created for code Deploy
+  * Calls create deploy command to call code deploy agent to run application on EC2 instance. git 
       
         
 
