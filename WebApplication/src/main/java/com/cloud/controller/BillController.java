@@ -53,7 +53,6 @@ public class BillController {
     @PostMapping(value = "/v1/bill/")
     public ResponseEntity<?> createBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
-
         //check that authorization header is not missing
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -87,9 +86,8 @@ public class BillController {
     }
 
 
-    @GetMapping("/v1/bills")
+    @GetMapping("/v2/bills")
     public ResponseEntity<?> getBills(@RequestHeader(value = "Authorization", required = false) String token) throws Exception {
-
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -113,7 +111,6 @@ public class BillController {
 
     @GetMapping("/v1/bill/{id}")
     public ResponseEntity<?> getBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) throws Exception {
-
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -150,7 +147,6 @@ public class BillController {
 
     @DeleteMapping("/v1/bill/{id}")
     public ResponseEntity<?> deleteBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String id) throws Exception {
-
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
