@@ -5,7 +5,8 @@ import com.cloud.errors.UserRegistrationStatus;
 import com.cloud.service.UserService;
 import com.cloud.validator.UserValidator;
 import com.timgroup.statsd.StatsDClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import java.util.Date;
 @RequestMapping("/")
 public class UserController {
 
-    private final static Logger logger = Logger.getLogger(UserController.class);
+    private final static Logger logger = LogManager.getLogger(UserController.class);
     private final String userHTTPGET = "endpoint.user.register.HTTP.GET";
     private final String userHTTPPOST = "endpoint.user.register.HTTP.POST";
     private final String userHTTPPUT = "endpoint.user.register.HTTP.PUT";

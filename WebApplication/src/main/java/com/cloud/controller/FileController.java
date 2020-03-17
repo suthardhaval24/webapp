@@ -10,7 +10,8 @@ import com.cloud.service.FileStorageService;
 import com.cloud.service.UserService;
 import com.timgroup.statsd.StatsDClient;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import java.util.UUID;
 @RestController
 public class FileController {
 
-    private final static Logger logger = Logger.getLogger(BillController.class);
+    private final static Logger logger = LogManager.getLogger(BillController.class);
     private final String fileHTTPGET = "endpoint.file.HTTP.GET";
     private final String fileHTTPPOST = "endpoint.file.HTTP.POST";
     private final String fileHTTPDELETE = "endpoint.file.HTTP.DELETE";
