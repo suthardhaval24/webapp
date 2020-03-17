@@ -10,6 +10,8 @@ import com.cloud.service.BillService;
 import com.cloud.service.UserService;
 import com.cloud.validator.BillValidator;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.timgroup.statsd.StatsDClient;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,13 @@ import java.util.*;
 
 @RestController
 public class BillController {
+
+    private final static Logger logger = Logger.getLogger(BillController.class);
+    private final String billHTTPGET = "endpoint.bill.HTTP.GET";
+    private final String billsHTTPGET = "endpoint.bills.HTTP.GET";
+    private final String billHTTPPOST = "endpoint.bill.HTTP.POST";
+    private final String billHTTPPUT = "endpoint.bill.HTTP.PUT";
+    private final String billHTTPDELETE = "endpoint.bill.HTTP.DELETE";
 
     @Autowired
     BillRepository billRepository;
@@ -44,6 +53,9 @@ public class BillController {
     @Autowired
     private AWSFileStorageService awsFileStorageService;
 
+    @Autowired
+    private StatsDClient statsd;
+
     @InitBinder
     private void initBinder(WebDataBinder binder) {
         binder.setValidator(billValidator);
@@ -53,6 +65,9 @@ public class BillController {
     @PostMapping(value = "/v1/bill/")
     public ResponseEntity<?> createBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
+        statsd.incrementCounter(billHTTPPOST);
+        statsd.recordExecutionTime(billHTTPPOST,25);
+        logger.info("Bill: Post Method");
         //check that authorization header is not missing
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -85,9 +100,10 @@ public class BillController {
         }
     }
 
-
-    @GetMapping("/v2/bills")
+    @GetMapping("/v1/bills")
     public ResponseEntity<?> getBills(@RequestHeader(value = "Authorization", required = false) String token) throws Exception {
+        statsd.incrementCounter(billsHTTPGET);
+        logger.info("Bills: GET Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -111,6 +127,8 @@ public class BillController {
 
     @GetMapping("/v1/bill/{id}")
     public ResponseEntity<?> getBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) throws Exception {
+        statsd.incrementCounter(billHTTPGET);
+        logger.info("Bill: GET Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -147,6 +165,8 @@ public class BillController {
 
     @DeleteMapping("/v1/bill/{id}")
     public ResponseEntity<?> deleteBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String id) throws Exception {
+        statsd.incrementCounter(billHTTPDELETE);
+        logger.info("Bill: DELETE Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -191,6 +211,8 @@ public class BillController {
     @PutMapping("/v1/bill/{id}")
     public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         @PathVariable("id") String id) throws Exception {
+        statsd.incrementCounter(billHTTPPUT);
+        logger.info("Bill: PUT Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unauthorized");
         }

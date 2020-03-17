@@ -8,7 +8,9 @@ import com.cloud.repository.FileRepository;
 import com.cloud.service.AWSFileStorageService;
 import com.cloud.service.FileStorageService;
 import com.cloud.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,11 @@ import java.util.UUID;
 
 @RestController
 public class FileController {
+
+    private final static Logger logger = Logger.getLogger(BillController.class);
+    private final String fileHTTPGET = "endpoint.file.HTTP.GET";
+    private final String fileHTTPPOST = "endpoint.file.HTTP.POST";
+    private final String fileHTTPDELETE = "endpoint.file.HTTP.DELETE";
 
     @Autowired
     private FileRepository fileRepository;
@@ -37,12 +44,18 @@ public class FileController {
     @Autowired
     private AWSFileStorageService awsFileStorageService;
 
+    @Autowired
+    private StatsDClient statsd;
+
     @PostMapping("/v1/bill/{billId}/file")
     public ResponseEntity<?> uploadFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String id,
                                         @RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
-
+        statsd.incrementCounter(fileHTTPPOST);
+        statsd.recordExecutionTime(fileHTTPPOST,25);
+        logger.info("File: Post Method");
         //check that authorization header is not missing
         if (token == null) {
+            logger.debug("Bill: Post Method: User Unauthorized");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
@@ -95,8 +108,10 @@ public class FileController {
     @GetMapping("/v1/bill/{billId}/file/{fileId}")
     public ResponseEntity<?> getFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String billId,
                                      @PathVariable("fileId") String fileId) throws Exception {
-
+        statsd.incrementCounter(fileHTTPGET);
+        logger.info("File: GET Method");
         if (token == null) {
+            logger.debug("Bill: Post Method: User Unauthorized");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
@@ -152,7 +167,10 @@ public class FileController {
     @DeleteMapping("/v1/bill/{billId}/file/{fileId}")
     public ResponseEntity<?> deleteFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String billId,
                                         @PathVariable("fileId") String fileId) throws Exception {
+        statsd.incrementCounter(fileHTTPDELETE);
+        logger.info("File: DELETE Method");
         if (token == null) {
+            logger.debug("Bill: Post Method: User Unauthorized");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 

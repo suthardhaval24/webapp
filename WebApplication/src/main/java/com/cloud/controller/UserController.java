@@ -4,6 +4,8 @@ import com.cloud.entity.User;
 import com.cloud.errors.UserRegistrationStatus;
 import com.cloud.service.UserService;
 import com.cloud.validator.UserValidator;
+import com.timgroup.statsd.StatsDClient;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +25,19 @@ import java.util.Date;
 @RequestMapping("/")
 public class UserController {
 
+    private final static Logger logger = Logger.getLogger(UserController.class);
+    private final String userHTTPGET = "endpoint.user.register.HTTP.GET";
+    private final String userHTTPPOST = "endpoint.user.register.HTTP.POST";
+    private final String userHTTPPUT = "endpoint.user.register.HTTP.PUT";
+
     @Autowired
     private UserService userService;
 
     @Autowired
     private UserValidator userValidator;
+
+    @Autowired
+    private StatsDClient statsd;
 
     @InitBinder
     private void initBinder(WebDataBinder binder) {
@@ -38,6 +48,8 @@ public class UserController {
     @RequestMapping(value = "v1/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
+        statsd.incrementCounter(userHTTPPOST);
+        logger.info("User : Post Method");
         UserRegistrationStatus registrationStatus;
 
         if (errors.hasErrors()) {
@@ -49,7 +61,7 @@ public class UserController {
             user.setUpdatedTime(new Date());
             registrationStatus = new UserRegistrationStatus();
             User u = userService.saveUser(user);
-
+            logger.info("User Created Successfully");
             return new ResponseEntity<User>(u, HttpStatus.CREATED);
         }
     }
@@ -58,7 +70,10 @@ public class UserController {
     @RequestMapping(value = "v1/user/self", method = RequestMethod.GET)
     public ResponseEntity<?> getUser(@RequestHeader(value = "Authorization", required = false) String token, HttpServletRequest request) throws UnsupportedEncodingException {
 
+        statsd.incrementCounter(userHTTPGET);
+        logger.info("User: Get Method");
         if (token == null) {
+            logger.debug("User: Put Method:UNAUTHORIZED");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
@@ -74,7 +89,10 @@ public class UserController {
     @RequestMapping(value = "v1/user/self", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUser(@RequestHeader(value = "Authorization", required = false) String Header, @Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws UnsupportedEncodingException {
+        statsd.incrementCounter(userHTTPPUT);
+        logger.info("User: Put Method");
         if (Header == null) {
+            logger.debug("User: Put Method:UNAUTHORIZED");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
