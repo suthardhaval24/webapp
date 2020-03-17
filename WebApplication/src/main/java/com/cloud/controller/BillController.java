@@ -66,8 +66,8 @@ public class BillController {
     @PostMapping(value = "/v1/bill/")
     public ResponseEntity<?> createBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPPOST);
-        statsd.recordExecutionTime(billHTTPPOST,3000);
         logger.info("Bill: Post Method");
         //check that authorization header is not missing
         if (token == null) {
@@ -97,6 +97,9 @@ public class BillController {
             //from this attachment always be null
             bill.setFileUpload(null);
             Bill new_bill = billRepository.save(bill);
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+            statsd.recordExecutionTime(billHTTPPOST,duration);
             return new ResponseEntity<Bill>(new_bill, HttpStatus.CREATED);
         }
     }

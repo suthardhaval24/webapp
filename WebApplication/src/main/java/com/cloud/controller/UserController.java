@@ -49,8 +49,8 @@ public class UserController {
     @RequestMapping(value = "v1/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(userHTTPPOST);
-        statsd.recordExecutionTime(userHTTPPOST,3000);
         logger.info("User : Post Method");
         UserRegistrationStatus registrationStatus;
 
@@ -64,6 +64,9 @@ public class UserController {
             registrationStatus = new UserRegistrationStatus();
             User u = userService.saveUser(user);
             logger.info("User Created Successfully");
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+            statsd.recordExecutionTime(userHTTPPOST,duration);
             return new ResponseEntity<User>(u, HttpStatus.CREATED);
         }
     }
