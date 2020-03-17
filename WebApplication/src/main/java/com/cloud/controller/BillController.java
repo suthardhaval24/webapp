@@ -11,7 +11,8 @@ import com.cloud.service.UserService;
 import com.cloud.validator.BillValidator;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.timgroup.statsd.StatsDClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ import java.util.*;
 @RestController
 public class BillController {
 
-    private final static Logger logger = Logger.getLogger(BillController.class);
+    private final static Logger logger = LogManager.getLogger(BillController.class);
     private final String billHTTPGET = "endpoint.bill.HTTP.GET";
     private final String billsHTTPGET = "endpoint.bills.HTTP.GET";
     private final String billHTTPPOST = "endpoint.bill.HTTP.POST";
