@@ -66,7 +66,7 @@ public class UserController {
             logger.info("User Created Successfully");
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime);
-            statsd.recordExecutionTime(userHTTPPOST,duration);
+            statsd.recordExecutionTime(userHTTPPOST, duration);
             return new ResponseEntity<User>(u, HttpStatus.CREATED);
         }
     }
@@ -74,9 +74,8 @@ public class UserController {
     //GET API : get user info
     @RequestMapping(value = "v1/user/self", method = RequestMethod.GET)
     public ResponseEntity<?> getUser(@RequestHeader(value = "Authorization", required = false) String token, HttpServletRequest request) throws UnsupportedEncodingException {
-
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(userHTTPGET);
-        statsd.recordExecutionTime(userHTTPGET,3000);
         logger.info("User: Get Method");
         if (token == null) {
             logger.debug("User: Put Method:UNAUTHORIZED");
@@ -87,16 +86,20 @@ public class UserController {
 
         if (!(userService.isEmailPresent(userDetails[0])))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        else
+        else {
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+            statsd.recordExecutionTime(userHTTPGET, duration);
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(userDetails[0]));
+        }
     }
 
     //PUT API : Upate user
     @RequestMapping(value = "v1/user/self", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUser(@RequestHeader(value = "Authorization", required = false) String Header, @Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws UnsupportedEncodingException {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(userHTTPPUT);
-        statsd.recordExecutionTime(userHTTPPUT,3000);
         logger.info("User: Put Method");
         if (Header == null) {
             logger.debug("User: Put Method:UNAUTHORIZED");
@@ -105,6 +108,9 @@ public class UserController {
 
         String[] userDetails = decryptAuthenticationToken(Header);
         if (userService.updateUserInfo(user, userDetails[0], userDetails[1])) {
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+            statsd.recordExecutionTime(userHTTPPUT, duration);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");

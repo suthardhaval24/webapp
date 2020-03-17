@@ -184,7 +184,8 @@ Pre-req : Need POSTMAN and MySQL installed.
   * Install AWS CLI and set profile 
   * Creates zip artifact of the project 
   * Uploads it to AWS S3 Bucket created for code Deploy
-  * Calls create deploy command to call code deploy agent to run application on EC2 instance. git 
+  * Calls create deploy command to call code deploy agent to run application on EC2 instance.
+  * Configures Cloudwatch agent to collect logs and relevant metrics and populates into AWS CloudWatch  
       
         
 

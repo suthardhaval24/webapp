@@ -99,15 +99,15 @@ public class BillController {
             Bill new_bill = billRepository.save(bill);
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime);
-            statsd.recordExecutionTime(billHTTPPOST,duration);
+            statsd.recordExecutionTime(billHTTPPOST, duration);
             return new ResponseEntity<Bill>(new_bill, HttpStatus.CREATED);
         }
     }
 
     @GetMapping("/v1/bills")
     public ResponseEntity<?> getBills(@RequestHeader(value = "Authorization", required = false) String token) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billsHTTPGET);
-        statsd.recordExecutionTime(billsHTTPGET,3000);
         logger.info("Bills: GET Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -124,16 +124,20 @@ public class BillController {
             //if user has no bills
             if (all_bills.isEmpty())
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No bills found");
-            else
+            else {
+                long endTime = System.currentTimeMillis();
+                long duration = (endTime - startTime);
+                statsd.recordExecutionTime(billsHTTPGET, duration);
                 return new ResponseEntity<List<Bill>>(all_bills, HttpStatus.OK);
+            }
         }
 
     }
 
     @GetMapping("/v1/bill/{id}")
     public ResponseEntity<?> getBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPGET);
-        statsd.recordExecutionTime(billHTTPGET,3000);
         logger.info("Bill: GET Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -164,6 +168,9 @@ public class BillController {
             if (!user_bill.getOwner_id().equals(user.getUuid())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
             } else {
+                long endTime = System.currentTimeMillis();
+                long duration = (endTime - startTime);
+                statsd.recordExecutionTime(billHTTPGET, duration);
                 return new ResponseEntity<Bill>(user_bill, HttpStatus.OK);
             }
         }
@@ -171,8 +178,8 @@ public class BillController {
 
     @DeleteMapping("/v1/bill/{id}")
     public ResponseEntity<?> deleteBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String id) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPDELETE);
-        statsd.recordExecutionTime(billHTTPDELETE,3000);
         logger.info("Bill: DELETE Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -204,11 +211,14 @@ public class BillController {
                 //delete file from dir
                 if (bill.getFileUpload() != null) {
                     String path = bill.getFileUpload().getUrl();
-                    if(!awsFileStorageService.deleteFile(path)){
+                    if (!awsFileStorageService.deleteFile(path)) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                     }
                 }
                 billRepository.delete(bill);
+                long endTime = System.currentTimeMillis();
+                long duration = (endTime - startTime);
+                statsd.recordExecutionTime(billHTTPDELETE, duration);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
 
             }
@@ -218,8 +228,8 @@ public class BillController {
     @PutMapping("/v1/bill/{id}")
     public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         @PathVariable("id") String id) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPPUT);
-        statsd.recordExecutionTime(billHTTPPUT,3000);
         logger.info("Bill: PUT Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unauthorized");
@@ -264,6 +274,9 @@ public class BillController {
                     currentBill.setUpdatedTime(new Date());
                     currentBill.setCategories(bill.getCategories());
                     billRepository.save(currentBill);
+                    long endTime = System.currentTimeMillis();
+                    long duration = (endTime - startTime);
+                    statsd.recordExecutionTime(billHTTPPUT, duration);
                     return new ResponseEntity<Bill>(currentBill, HttpStatus.OK);
                 }
             }

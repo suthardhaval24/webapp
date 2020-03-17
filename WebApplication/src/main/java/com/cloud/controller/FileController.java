@@ -51,8 +51,8 @@ public class FileController {
     @PostMapping("/v1/bill/{billId}/file")
     public ResponseEntity<?> uploadFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String id,
                                         @RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(fileHTTPPOST);
-        statsd.recordExecutionTime(fileHTTPPOST,3000);
         logger.info("File: Post Method");
         //check that authorization header is not missing
         if (token == null) {
@@ -98,6 +98,9 @@ public class FileController {
                         FileUpload newFileUpload = fileStorageService.storeFile(file, actualPath);
                         user_bill.setFileUpload(newFileUpload);
                         billRepository.save(user_bill);
+                        long endTime = System.currentTimeMillis();
+                        long duration = (endTime - startTime);
+                        statsd.recordExecutionTime(fileHTTPPOST, duration);
                         //System.out.println(fileDownloadUri);
                         return new ResponseEntity<FileUpload>(newFileUpload, HttpStatus.CREATED);
                     }
@@ -109,8 +112,8 @@ public class FileController {
     @GetMapping("/v1/bill/{billId}/file/{fileId}")
     public ResponseEntity<?> getFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String billId,
                                      @PathVariable("fileId") String fileId) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(fileHTTPGET);
-        statsd.recordExecutionTime(fileHTTPGET,3000);
         logger.info("File: GET Method");
         if (token == null) {
             logger.debug("Bill: Post Method: User Unauthorized");
@@ -158,6 +161,9 @@ public class FileController {
                 if (!user_bill.getFileUpload().getId().equals(fileUpload.getId())) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
                 } else {
+                    long endTime = System.currentTimeMillis();
+                    long duration = (endTime - startTime);
+                    statsd.recordExecutionTime(fileHTTPGET, duration);
                     return new ResponseEntity<FileUpload>(fileUpload, HttpStatus.OK);
                 }
 
@@ -169,8 +175,8 @@ public class FileController {
     @DeleteMapping("/v1/bill/{billId}/file/{fileId}")
     public ResponseEntity<?> deleteFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String billId,
                                         @PathVariable("fileId") String fileId) throws Exception {
+        long startTime = System.currentTimeMillis();
         statsd.incrementCounter(fileHTTPDELETE);
-        statsd.recordExecutionTime(fileHTTPDELETE,3000);
         logger.info("File: DELETE Method");
         if (token == null) {
             logger.debug("Bill: Post Method: User Unauthorized");
@@ -228,6 +234,9 @@ public class FileController {
                     fileRepository.delete(fileUpload);
                     user_bill.setFileUpload(null);
                     billRepository.save(user_bill);
+                    long endTime = System.currentTimeMillis();
+                    long duration = (endTime - startTime);
+                    statsd.recordExecutionTime(fileHTTPDELETE, duration);
                     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
                 }
             }
