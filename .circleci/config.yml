@@ -48,7 +48,7 @@ jobs:
             cd codeDeploy_Artifact
             cp ../*.yml .
             cp ../CodeDeploy/*.sh .
-            cp ../cloudwatchconfig.json .
+            cp ../CloudWatchConfiguration.json .
             cp ../WebApplication/target/WebApplication-0.0.1-SNAPSHOT.jar .
             cp ../WebApplication/src/main/resources/*.properties .
             ls -al
