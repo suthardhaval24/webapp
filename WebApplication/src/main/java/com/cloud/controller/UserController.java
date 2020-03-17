@@ -50,6 +50,7 @@ public class UserController {
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
         statsd.incrementCounter(userHTTPPOST);
+        statsd.recordExecutionTime(userHTTPPOST,3000);
         logger.info("User : Post Method");
         UserRegistrationStatus registrationStatus;
 
@@ -72,6 +73,7 @@ public class UserController {
     public ResponseEntity<?> getUser(@RequestHeader(value = "Authorization", required = false) String token, HttpServletRequest request) throws UnsupportedEncodingException {
 
         statsd.incrementCounter(userHTTPGET);
+        statsd.recordExecutionTime(userHTTPGET,3000);
         logger.info("User: Get Method");
         if (token == null) {
             logger.debug("User: Put Method:UNAUTHORIZED");
@@ -91,6 +93,7 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestHeader(value = "Authorization", required = false) String Header, @Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws UnsupportedEncodingException {
         statsd.incrementCounter(userHTTPPUT);
+        statsd.recordExecutionTime(userHTTPPUT,3000);
         logger.info("User: Put Method");
         if (Header == null) {
             logger.debug("User: Put Method:UNAUTHORIZED");

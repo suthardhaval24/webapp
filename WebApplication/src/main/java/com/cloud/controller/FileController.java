@@ -52,7 +52,7 @@ public class FileController {
     public ResponseEntity<?> uploadFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String id,
                                         @RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
         statsd.incrementCounter(fileHTTPPOST);
-        statsd.recordExecutionTime(fileHTTPPOST,25);
+        statsd.recordExecutionTime(fileHTTPPOST,3000);
         logger.info("File: Post Method");
         //check that authorization header is not missing
         if (token == null) {
@@ -110,6 +110,7 @@ public class FileController {
     public ResponseEntity<?> getFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String billId,
                                      @PathVariable("fileId") String fileId) throws Exception {
         statsd.incrementCounter(fileHTTPGET);
+        statsd.recordExecutionTime(fileHTTPGET,3000);
         logger.info("File: GET Method");
         if (token == null) {
             logger.debug("Bill: Post Method: User Unauthorized");
@@ -169,6 +170,7 @@ public class FileController {
     public ResponseEntity<?> deleteFile(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("billId") String billId,
                                         @PathVariable("fileId") String fileId) throws Exception {
         statsd.incrementCounter(fileHTTPDELETE);
+        statsd.recordExecutionTime(fileHTTPDELETE,3000);
         logger.info("File: DELETE Method");
         if (token == null) {
             logger.debug("Bill: Post Method: User Unauthorized");
