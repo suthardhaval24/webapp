@@ -48,6 +48,7 @@ jobs:
             cd codeDeploy_Artifact
             cp ../*.yml .
             cp ../CodeDeploy/*.sh .
+            cp ../cloudwatchconfig.json .
             cp ../WebApplication/target/WebApplication-0.0.1-SNAPSHOT.jar .
             cp ../WebApplication/src/main/resources/*.properties .
             ls -al
@@ -64,7 +65,7 @@ jobs:
       - run:
           name: CodeDeploy API call
           command: |
-            aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=${CODE_DEPLOY_S3_BUCKET},bundleType=zip,key=csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
+            aws deploy create-deployment --output json --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=${CODE_DEPLOY_S3_BUCKET},bundleType=zip,key=csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
       - run:
           name: Step into webapp and execute test
           command: |
