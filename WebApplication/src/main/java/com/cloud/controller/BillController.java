@@ -67,7 +67,7 @@ public class BillController {
     public ResponseEntity<?> createBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
         statsd.incrementCounter(billHTTPPOST);
-        statsd.recordExecutionTime(billHTTPPOST,25);
+        statsd.recordExecutionTime(billHTTPPOST,3000);
         logger.info("Bill: Post Method");
         //check that authorization header is not missing
         if (token == null) {
@@ -104,6 +104,7 @@ public class BillController {
     @GetMapping("/v1/bills")
     public ResponseEntity<?> getBills(@RequestHeader(value = "Authorization", required = false) String token) throws Exception {
         statsd.incrementCounter(billsHTTPGET);
+        statsd.recordExecutionTime(billsHTTPGET,3000);
         logger.info("Bills: GET Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -129,6 +130,7 @@ public class BillController {
     @GetMapping("/v1/bill/{id}")
     public ResponseEntity<?> getBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) throws Exception {
         statsd.incrementCounter(billHTTPGET);
+        statsd.recordExecutionTime(billHTTPGET,3000);
         logger.info("Bill: GET Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -167,6 +169,7 @@ public class BillController {
     @DeleteMapping("/v1/bill/{id}")
     public ResponseEntity<?> deleteBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String id) throws Exception {
         statsd.incrementCounter(billHTTPDELETE);
+        statsd.recordExecutionTime(billHTTPDELETE,3000);
         logger.info("Bill: DELETE Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -213,6 +216,7 @@ public class BillController {
     public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         @PathVariable("id") String id) throws Exception {
         statsd.incrementCounter(billHTTPPUT);
+        statsd.recordExecutionTime(billHTTPPUT,3000);
         logger.info("Bill: PUT Method");
         if (token == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unauthorized");
