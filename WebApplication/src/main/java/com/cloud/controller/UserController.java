@@ -45,6 +45,12 @@ public class UserController {
         binder.setValidator(userValidator);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/health", produces = "application/json")
+    public ResponseEntity<String> healthCheck() {
+        String reply = "{\"RESPONSE\" : \"Health check successsfull\"}";
+        return ResponseEntity.status(HttpStatus.OK).body(reply);
+    }
+
     //Post API : post user info
     @RequestMapping(value = "v1/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult errors,
