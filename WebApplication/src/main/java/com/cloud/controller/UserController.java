@@ -23,7 +23,6 @@ import java.util.Base64;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/")
 public class UserController {
 
     private final static Logger logger = LogManager.getLogger(UserController.class);
