@@ -2,7 +2,7 @@
 cd /home/ubuntu
 sudo chown -R ubuntu:ubuntu /home/ubuntu/
 sudo chmod +x WebApplication-0.0.1-SNAPSHOT.jar
-source /etc/environment
+. /etc/environment
 nohup printenv > /home/ubuntu/environment.txt
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ubuntu/CloudWatchConfiguration.json -s
 kill -9 $(ps -ef|grep WebApplication | grep -v grep | awk '{print$2}')
