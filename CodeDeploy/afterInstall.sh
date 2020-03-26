@@ -2,7 +2,7 @@
 cd /home/ubuntu
 sudo chown -R ubuntu:ubuntu /home/ubuntu/
 sudo chmod +x WebApplication-0.0.1-SNAPSHOT.jar
-sudo source /etc/profile.d/envvariable.sh
+sudo source /etc/environment
 printenv
 nohup printenv > /home/ubuntu/environment.txt
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ubuntu/CloudWatchConfiguration.json -s
