@@ -1,19 +1,34 @@
 package com.cloud.controller;
 
-import com.cloud.repository.BillRepository;
-import com.cloud.repository.UserRepository;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.cloud.entity.Bill;
 import com.cloud.entity.User;
 import com.cloud.errors.BillStatus;
+import com.cloud.repository.BillRepository;
+import com.cloud.repository.UserRepository;
 import com.cloud.service.AWSFileStorageService;
 import com.cloud.service.BillService;
 import com.cloud.service.UserService;
 import com.cloud.validator.BillValidator;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.timgroup.statsd.StatsDClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -22,8 +37,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -32,6 +47,7 @@ public class BillController {
     private final static Logger logger = LogManager.getLogger(BillController.class);
     private final String billHTTPGET = "endpoint.bill.HTTP.GET";
     private final String billsHTTPGET = "endpoint.bills.HTTP.GET";
+    private final String DueBillsHTTPGET = "endpoint.Duebills.HTTP.GET";
     private final String billHTTPPOST = "endpoint.bill.HTTP.POST";
     private final String billHTTPPUT = "endpoint.bill.HTTP.PUT";
     private final String billHTTPDELETE = "endpoint.bill.HTTP.DELETE";
@@ -56,6 +72,9 @@ public class BillController {
 
     @Autowired
     private StatsDClient statsd;
+
+    @Value("${ARN}")
+    private String topicArn;
 
     @InitBinder
     private void initBinder(WebDataBinder binder) {
@@ -134,8 +153,47 @@ public class BillController {
 
     }
 
+    @GetMapping("/v1/bill/due/{x}")
+    public ResponseEntity<?> getDueBills(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("x") String days) throws Exception {
+        long startTime = System.currentTimeMillis();
+        statsd.incrementCounter(DueBillsHTTPGET);
+        logger.info("DueBill: GET Method");
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        String userDetails[] = decryptAuthenticationToken(token);
+
+        if (!days.matches("^([012]?[0-9]?[0-9]|3[0-5][0-9]|36[0-6])$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid URL");
+        }
+
+        if (!(userService.isEmailPresent(userDetails[0])))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        else {
+            User user = userService.getUser(userDetails[0]);
+            //sending message to queue
+            String QUEUE_NAME = "BillDueQueue";
+            AmazonSQS sqs = AmazonSQSClient.builder().withRegion("us-east-1")
+                    .withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+            String queue_url = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
+            JsonObject dueBillMessage = new JsonObject();
+            dueBillMessage.addProperty("Days", days);
+            dueBillMessage.addProperty("Email", user.getEmailId());
+            sqs.sendMessage(new SendMessageRequest(queue_url, dueBillMessage.toString()));
+
+            snsQuery(user);
+
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+            statsd.recordExecutionTime(billsHTTPGET, duration);
+            return new ResponseEntity<String>("Bills Link will be sent on you email address inside 1 hour", HttpStatus.OK);
+        }
+    }
+
     @GetMapping("/v1/bill/{id}")
-    public ResponseEntity<?> getBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) throws Exception {
+    public ResponseEntity<?> getBill(@RequestHeader(value = "Authorization", required = false) String
+                                             token, @PathVariable("id") String id) throws Exception {
         long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPGET);
         logger.info("Bill: GET Method");
@@ -177,7 +235,8 @@ public class BillController {
     }
 
     @DeleteMapping("/v1/bill/{id}")
-    public ResponseEntity<?> deleteBill(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String id) throws Exception {
+    public ResponseEntity<?> deleteBill(@RequestHeader(value = "Authorization", required = false) String
+                                                token, @PathVariable String id) throws Exception {
         long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPDELETE);
         logger.info("Bill: DELETE Method");
@@ -226,7 +285,8 @@ public class BillController {
     }
 
     @PutMapping("/v1/bill/{id}")
-    public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
+    public ResponseEntity<?> updateBill(@RequestHeader(value = "Authorization", required = false) String
+                                                token, @Valid @RequestBody(required = false) Bill bill, BindingResult errors,
                                         @PathVariable("id") String id) throws Exception {
         long startTime = System.currentTimeMillis();
         statsd.incrementCounter(billHTTPPUT);
@@ -281,6 +341,59 @@ public class BillController {
                 }
             }
         }
+    }
+
+    public void snsQuery(User user) {
+        //Querying and SNS
+        //retrieve user bills
+        String message = null;
+        JsonObject sqsJson = null;
+        String QUEUE_NAME = "BillDueQueue";
+        AmazonSQS sqs = AmazonSQSClient.builder().withRegion("us-east-1")
+                .withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+        String queue_url = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
+        List<Message> messages = sqs.receiveMessage(queue_url).getMessages();
+        Message sqsMessage = messages.get(0);
+        String jsonMsg = sqsMessage.getBody();
+        JSONParser parser = new JSONParser();
+        try {
+            sqsJson = (JsonObject) parser.parse(jsonMsg);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        String days = sqsJson.get("Days").toString();
+        LocalDate dueDate = LocalDate.now().plusDays(Long.parseLong(days));
+        Date billDuedate = java.sql.Date.valueOf(dueDate);
+        List<Bill> all_bills = billRepository.findByDueDate(user.getUuid(), billDuedate);
+        if (all_bills.isEmpty())
+            message = "No bill found";
+        else {
+            //if user has no bills
+            List<String> dueBillLinks = new ArrayList<>();
+            for (Bill b :
+                    all_bills) {
+                if (b.getFileUpload() != null) {
+                    dueBillLinks.add(b.getFileUpload().getUrl());
+                    System.out.println(b.getFileUpload().getUrl());
+                }
+            }
+
+            String json = new Gson().toJson(dueBillLinks);
+
+            JsonObject dueBill = new JsonObject();
+            dueBill.addProperty("Email", user.getEmailId());
+            dueBill.addProperty("DueBill", json);
+
+            message = dueBill.toString();
+        }
+
+        AmazonSNS snsClient = AmazonSNSClient.builder().withRegion("us-east-1")
+                .withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+
+        PublishRequest publishRequest = new PublishRequest(topicArn, message);
+        PublishResult publishResult = snsClient.publish(publishRequest);
+        logger.info("SNS Publish Result: " + publishResult);
     }
 
     //json mapping exception
