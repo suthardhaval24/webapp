@@ -177,6 +177,7 @@ public class BillController {
             AmazonSQS sqs = AmazonSQSClient.builder().withRegion("us-east-1")
                     .withCredentials(new InstanceProfileCredentialsProvider(false)).build();
             String queue_url = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
+            logger.info("QueueName", queue_url);
             JsonObject dueBillMessage = new JsonObject();
             dueBillMessage.addProperty("Days", days);
             dueBillMessage.addProperty("Email", user.getEmailId());
