@@ -78,11 +78,11 @@ public class AWSFileStorageService {
         String fileUrl = "";
         try {
             File file = convertMultiPartToFile(multipartFile);
-            String prefix = "https:///";
+            String prefix = "https://";
             String uniqueID = UUID.randomUUID().toString();
             String fileName = generateFileName(multipartFile) + "_" + uniqueID + "." + FilenameUtils.getExtension(multipartFile.getOriginalFilename());
             this.updateFileName = fileName;
-            fileStorageLocation = Paths.get(prefix + bucketName + ".s3.amazonaws.com");
+            fileStorageLocation = Paths.get(prefix + "/" + bucketName + ".s3.amazonaws.com");
             fileUrl = fileStorageLocation + "/" + fileName;
             uploadFileTos3bucket(fileName, file);
             //file.delete();

@@ -17,6 +17,6 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
     @Query("FROM Bill b WHERE b.user.uuid=:user_id")
     List<Bill> findByOwnerId(@Param("user_id") UUID owner_id);
 
-    @Query("FROM Bill b WHERE b.user.uuid=:user_id AND b.due_date < :due_Date AND b.payment_status='due'")
+    @Query("FROM Bill b WHERE b.user.uuid=:user_id AND b.due_date < :due_Date AND b.payment_status='due' AND b.fileUpload IS NOT NULL")
     List<Bill> findByDueDate(@Param("user_id") UUID owner_id, @Param("due_Date") Date date);
 }
