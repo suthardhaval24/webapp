@@ -1,7 +1,10 @@
 package com.cloud.controller;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
@@ -52,6 +55,7 @@ public class BillController {
     private final String billHTTPPOST = "endpoint.bill.HTTP.POST";
     private final String billHTTPPUT = "endpoint.bill.HTTP.PUT";
     private final String billHTTPDELETE = "endpoint.bill.HTTP.DELETE";
+    private final String TABLE_NAME = "csye6225_Webapp_BillDues";
 
     @Autowired
     BillRepository billRepository;
@@ -189,11 +193,18 @@ public class BillController {
                 snsQuery(user);
             }).start();
 
+            //check if request is already made in 60 minutes
 
-            long endTime = System.currentTimeMillis();
-            long duration = (endTime - startTime);
-            statsd.recordExecutionTime(billsHTTPGET, duration);
-            return new ResponseEntity<String>("Bills Link will be sent on you email address inside 1 hour", HttpStatus.OK);
+            Boolean flag = checkDynamoDB(user.getEmailId());
+
+            if(flag) {
+                return new ResponseEntity<String>("Already requested in 1 hour time frame.", HttpStatus.OK);
+            } else {
+                long endTime = System.currentTimeMillis();
+                long duration = (endTime - startTime);
+                statsd.recordExecutionTime(DueBillsHTTPGET, duration);
+                return new ResponseEntity<String>("Bills Link will be sent on your email address inside 1 hour.", HttpStatus.OK);
+            }
         }
     }
 
@@ -400,6 +411,18 @@ public class BillController {
         PublishRequest publishRequest = new PublishRequest(topicArn, message);
         PublishResult publishResult = snsClient.publish(publishRequest);
         logger.info("SNS Publish Result: " + publishResult);
+    }
+
+    boolean checkDynamoDB(String userName) {
+        logger.info("DYNAMO DB CHECK");
+        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
+        DynamoDB dynamoDB = new DynamoDB(client);
+        Item existUser = dynamoDB.getTable(TABLE_NAME).getItem("id", userName);
+        if (existUser != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     //json mapping exception
