@@ -348,7 +348,7 @@ public class BillController {
         //Querying and SNS
         //retrieve user bills
         String message = null;
-        JsonObject sqsJson = null;
+        JSONObject sqsJson = null;
         String QUEUE_NAME = "BillDueQueue";
         AmazonSQS sqs = AmazonSQSClient.builder().withRegion("us-east-1")
                 .withCredentials(new InstanceProfileCredentialsProvider(false)).build();
@@ -358,7 +358,7 @@ public class BillController {
         String jsonMsg = sqsMessage.getBody();
         JSONParser parser = new JSONParser();
         try {
-            sqsJson = (JsonObject) parser.parse(jsonMsg);
+            sqsJson = (JSONObject) parser.parse(jsonMsg);
         } catch (ParseException e) {
             e.printStackTrace();
         }
