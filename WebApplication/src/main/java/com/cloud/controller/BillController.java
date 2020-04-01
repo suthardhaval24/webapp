@@ -184,7 +184,11 @@ public class BillController {
             dueBillMessage.addProperty("Email", user.getEmailId());
             sqs.sendMessage(new SendMessageRequest(queue_url, dueBillMessage.toString()));
 
-            snsQuery(user);
+            //creating a thread to run method in background
+            new Thread(() -> {
+                snsQuery(user);
+            }).start();
+
 
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime);
