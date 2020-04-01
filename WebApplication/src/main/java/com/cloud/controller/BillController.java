@@ -81,6 +81,10 @@ public class BillController {
     @Value("${ARN}")
     private String topicArn;
 
+    @Value("${domainName}")
+    private String domain;
+
+
     @InitBinder
     private void initBinder(WebDataBinder binder) {
         binder.setValidator(billValidator);
@@ -197,7 +201,7 @@ public class BillController {
 
             Boolean flag = checkDynamoDB(user.getEmailId());
 
-            if(flag) {
+            if (flag) {
                 return new ResponseEntity<String>("Already requested in 1 hour time frame.", HttpStatus.OK);
             } else {
                 long endTime = System.currentTimeMillis();
@@ -364,6 +368,7 @@ public class BillController {
         //Querying and SNS
         //retrieve user bills
         String message = null;
+        String prefix = domain + "/v1/bill/";
         JSONObject sqsJson = null;
         String QUEUE_NAME = "BillDueQueue";
         AmazonSQS sqs = AmazonSQSClient.builder().withRegion("us-east-1")
@@ -390,10 +395,7 @@ public class BillController {
             List<String> dueBillLinks = new ArrayList<>();
             for (Bill b :
                     all_bills) {
-                if (b.getFileUpload() != null) {
-                    dueBillLinks.add(b.getFileUpload().getUrl());
-                    System.out.println(b.getFileUpload().getUrl());
-                }
+                dueBillLinks.add(prefix + b.getId());
             }
 
             String json = new Gson().toJson(dueBillLinks);
