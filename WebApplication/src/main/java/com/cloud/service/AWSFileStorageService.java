@@ -78,7 +78,7 @@ public class AWSFileStorageService {
         String fileUrl = "";
         try {
             File file = convertMultiPartToFile(multipartFile);
-            String prefix = "https://";
+            String prefix = "http:\\/\\/";
             String uniqueID = UUID.randomUUID().toString();
             String fileName = generateFileName(multipartFile) + "_" + uniqueID + "." + FilenameUtils.getExtension(multipartFile.getOriginalFilename());
             this.updateFileName = fileName;
