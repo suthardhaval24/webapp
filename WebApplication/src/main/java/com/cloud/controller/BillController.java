@@ -368,6 +368,8 @@ public class BillController {
         //Querying and SNS
         //retrieve user bills
         String message = null;
+        //remove . from domain
+        domain = domain.substring(0, domain.length() - 1);
         String prefix = domain + "/v1/bill/";
         JSONObject sqsJson = null;
         String QUEUE_NAME = "BillDueQueue";
