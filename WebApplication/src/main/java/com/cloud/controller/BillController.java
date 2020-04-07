@@ -379,6 +379,7 @@ public class BillController {
         List<Message> messages = sqs.receiveMessage(queue_url).getMessages();
         Message sqsMessage = messages.get(0);
         String jsonMsg = sqsMessage.getBody();
+        sqs.changeMessageVisibility(QUEUE_NAME, sqsMessage.getReceiptHandle(), 60 * 60);
         JSONParser parser = new JSONParser();
         try {
             sqsJson = (JSONObject) parser.parse(jsonMsg);
