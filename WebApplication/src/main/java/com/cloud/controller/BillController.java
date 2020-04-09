@@ -11,7 +11,6 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.cloud.entity.Bill;
@@ -380,9 +379,7 @@ public class BillController {
         List<Message> messages = sqs.receiveMessage(queue_url).getMessages();
         Message sqsMessage = messages.get(0);
         String jsonMsg = sqsMessage.getBody();
-//        sqs.changeMessageVisibility(QUEUE_NAME, sqsMessage.getReceiptHandle(), 60 * 60);
-        final String messageReceiptHandle = messages.get(0).getReceiptHandle();
-        sqs.deleteMessage(new DeleteMessageRequest(QUEUE_NAME, messageReceiptHandle));
+        sqs.changeMessageVisibility(QUEUE_NAME, sqsMessage.getReceiptHandle(), 60 * 60);
         JSONParser parser = new JSONParser();
         try {
             sqsJson = (JSONObject) parser.parse(jsonMsg);
