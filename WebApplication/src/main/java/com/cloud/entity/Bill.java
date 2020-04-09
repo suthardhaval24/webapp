@@ -32,7 +32,6 @@ public class Bill {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date bill_date;
     @Column
-    @Temporal(TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date due_date;
     @Column
